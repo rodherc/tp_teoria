@@ -76,16 +76,17 @@ def verificaPadroes(linha):
 					contador = 0
 					transicao = automato[i]			# pega cada transicao
 					transicao = transicao.split("0")# divide em cada passo
-					if(i < 0):
+					if(i > 0):
+
 						for j in range(len(automato)):
-							
 							transAux = automato[j]
 							transAux = transAux.split("0")
 							if(transicao[0] == transAux[0]):
 								if(transicao[1] == transAux[1]):
 									contador +=1
 						if(contador != 1):
-							print("nao determitica")
+							print("nao deterministica")
+							return False
 							break
 
 
