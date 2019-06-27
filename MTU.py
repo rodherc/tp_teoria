@@ -24,15 +24,16 @@ class MTU:
 		j = 0
 		while(j < len(palavra)):
 			print("j no comeco",j)
+			verifica = True
 
 			for i in range(len(automato)):
-				verifica = False
+				
 				transicao = automato[i] # pega cada transicao
 				transicao = transicao.split("0") # divide em cada passo
 				if(transicao[0] == self.fita2):	# verfica o estado
 					
 					if(transicao[1] == palavra[j]): # verifica o simbolo lido
-						verifica = True
+						
 						print("fita2 antes :", self.fita2)
 						self.fita2 = transicao[2]	#att com o estado atual
 						print("fita 2 depois:", self.fita2)
@@ -42,13 +43,21 @@ class MTU:
 						
 						print("posicao 4", transicao[4])
 						if(transicao[4] == "11"):
-							j = j-2    ########## nao da certo , mover pra esquerda
-							print("j",j)
-			if(verifica):
-				j = j+1
-			else:
-				print("ta em loop")
+							if(j > 0):# primeirra posicao n pode ir pra esquerda
+								j = j-2    ########## nao da certo , mover pra esquerda
+								print("j",j)
+							else:
+								print("muito pra esquerda, cuidado com os seguidores de turing")
+								verifica = False
+								break
+			if(verifica == False):
+				print("entrei")
 				break
+			else:
+				j = j+1
+			#else:
+			#	print("ta em loop")
+			#	break
 
 		self.fita3 = ""
 		for i in range(len(palavra)):
