@@ -5,82 +5,87 @@ class MTU:
 	def __init__(self,fita1):
 		self.fita1 = fita1		#entrada
 		self.fita2 = "1"		# 1 representa o estado inicial q1
-		self.fita3 = ""
+		self.fita3 = ""			# inicializa vazia
 
-	def inicializaFita3(self): #palavra w
+	def inicializaFita3(self): #atualiza fita3 com a palavra w
 		aux = self.fita1.split("000")
 		self.fita3 = aux[2]
 
-		
-	def simulacao(self, padrao):
+	#faz a simulacao da MTU para a palavra de entrada
+	def simulacao(self):
 
-		palavra = self.fita3.split("0")
-		entrada = self.fita1.split("000")
+		palavra = self.fita3.split("0")		#pega a palavra
+		entrada = self.fita1.split("000")	# divide a entrada em automato/palavra
 		entrada = entrada[1].split("00")
 		automato = entrada
+		fitaUm = self.fita1.split("\n")  #usado so para o print
+		#prints para o menu
+		print("Inicio")
+		print("Fita 1: " + fitaUm[0])
+		print("Fita 2: " + self.fita2)
+		print("Fita 3: " + self.fita3)
+		print("Cabeca de leitura: 0" + "\n")
 
-		contPosicao = [0]*len(palavra)
-
-		for i in range(len(palavra)):
-			contPosicao[i] = 0
-
-		verificaEstado = True
-		verificaSimbolo = True
+		contPosicao = [0]*len(palavra)  # lista utilizada para a heuristica
+										# verificando se está em loop, verificando a quantidade de vezes
+										# que a execucao possou em cada posicao da fita 
 		j = 0
+		contTransicao = 0    # contrador para printar a transicao atual
 		while(j < len(palavra)):
-			#print("j no comeco",j)
 
-			verifica = True
+			verifica = True			# booleano utilizado para verificacao de erros no decorrer das transicoes
+			reconheceSimbolo = False	# booleano para reconhecer se existe transicao para o simbolo atual
+			
+			for i in range(len(automato)):
+				
+				transicao = automato[i] 		# pega cada transicao
+				transicao = transicao.split("0") # divide em cada passo
+				if(transicao[0] == self.fita2):	# verfica o estado
+					
+					if(transicao[1] == palavra[j]): # verifica o simbolo lido
+						contPosicao[j] += 1
 
-			if(padrao == False):
-				print("movendo para direita indefinidamente")
+						print("---------------")
+						reconheceSimbolo = True
+						
+						self.fita2 = transicao[2]	#atualiza com o estado atual
+						contTransicao += 1			#atualiza a quantidade de transicoes
+						print("transicao ", contTransicao)
+						print("Fita 2: ", self.fita2)
+						palavra[j] = transicao[3]	# atualiza com o novo simbolo
+						self.fita3 = ""
+						for i in range(len(palavra)):
+							self.fita3 += palavra[i] + "0"
+						print("Fita 3: " + self.fita3)
+						
+						if(transicao[4] == "11"): # verifica se a transicao é feita para esquerda
+							if(j > 0):# primeirra posicao n pode ir pra esquerda
+								j = j-2
+							else:
+								print("muito pra esquerda, cuidado com os seguidores de turing")
+								verifica = False
+								break
+
+						break
+			
+			if(reconheceSimbolo == False):# nao existe transicao apra o simbolo lido
+				print("palavra rejeitada")
+				break
+			elif(verifica == False): #se estiver fora do padrao para e rejeita
+				print("teste")
 				break
 			else:
-			
-				for i in range(len(automato)):
-					
-					transicao = automato[i] # pega cada transicao
-					transicao = transicao.split("0") # divide em cada passo
-					if(transicao[0] == self.fita2):	# verfica o estado
-						
-						if(transicao[1] == palavra[j]): # verifica o simbolo lido
-							contPosicao[j] += 1
-							
-							print("fita2 antes :", self.fita2)
-							self.fita2 = transicao[2]	#att com o estado atual
-							print("fita 2 depois:", self.fita2)
-							print("palavra lida :", palavra[j])
-							palavra[j] = transicao[3]	# att com o novo simbolo
-							print("palavra escrita :", palavra[j])
-							
-							print("posicao 4", transicao[4])
-							if(transicao[4] == "11"):
-								if(j > 0):# primeirra posicao n pode ir pra esquerda
-									j = j-2
-									print("j",j)
-								else:
-									print("muito pra esquerda, cuidado com os seguidores de turing")
-									verifica = False
-									break
-				if(verifica == False): #se estiver fora do padrao entra em loop
-					padrao = False
-					#break
-				else:
-					if(contPosicao[j] > 100):      #aplicacao da heuristica
-						                           #contabilizando o numero de vezes que se repete uma
-												   #mesma posicao na palavra
-						print("loop encontrado, parando automato")
-						break
-					j = j+1
-				#else:
-				#	print("ta em loop")
-				#	break
+				if(contPosicao[j] > 1000):      #aplicacao da heuristica
+												#contabilizando o numero de vezes que se repete uma
+												#mesma posicao na palavra
+					print("loop encontrado, parando automato")
+					break
+				j = j+1# atulaizacao da cabeca de leitura
+				print("Cabeca de leitura: ", j, "\n")
 
-		self.fita3 = ""
-		for i in range(len(palavra)):
-			self.fita3 += palavra[i] + "0"
-			print("passo ", i,self.fita3)
-		print("fita 3 ::::::" ,self.fita3)
+			#else:
+			#	print("ta em loop")
+			#	break
 
 #verifica se as transicoes passadas estao no formato -> en(qi)0en(x)0en(qj)0en(y)0en(d)
 def verificaPadroes(linha):
@@ -103,7 +108,7 @@ def verificaPadroes(linha):
 				for i in range(len(automato)):
 					transicao = automato[i]			# pega cada transicao
 					transicao = transicao.split("0")# divide em cada passo
-					print(transicao)
+
 					if(len(transicao) != 5):		# uma transicao de uma  MTU tem o formato de tamanho 5 -> en(qi)0en(x)0en(qj)0en(y)0en(d)
 						verifica = False			# se entrar n tem o formato
 						print("fora do padrao")
@@ -127,14 +132,14 @@ def verificaPadroes(linha):
 							return False
 							break
 
+					#verifica se existe algum simbolo diferente de 0 ou 1 no automato
 					for k in range(len(transicao)):
 						for j in range(len(transicao[k])):
-							print("olha o numero: " + transicao[k][j])
-							if(transicao[k][j] != "1"):  #verifica se existe algum simbolo diferente de 0 ou 1 no automato
+							if(transicao[k][j] != "1"):  
 								print("numero fora do padrao no automato: " + transicao[k][j])
 								verifica = False
 								break
-
+				#se nao houver erros encontrados verifica se a entrada comeca com B
 				if(verifica):
 					if(palavra[0] == "111"):      #verifica se comeca com B
 						for i in range(len(palavra)):
@@ -148,12 +153,13 @@ def verificaPadroes(linha):
 						print("palavra nao inicia com B")
 						verifica = False
 					                            
-					#verificar a necessidade dessa funcao e, se caso necessario, passar para a simulacao
-					#if(verifica):				#verifica se so tem B na palavra
-					#	verifica = False
-					#	for i in range(len(palavra)):
-					#		if(palavra[i] != "111"):
-					#			verifica = True
+					if(verifica):				#verifica se a apalavra de entrada so contem B's
+						verifica = False
+						for i in range(len(palavra)):
+							if(palavra[i] != "111"):
+								verifica = True
+						if(verifica == False):
+							print("palavra so contem B")
 
 				return verifica
 		else:
@@ -166,15 +172,12 @@ def verificaPadroes(linha):
 	
 def main():
 	arquivo = open(param)
+	linha = arquivo.read()	# leitura do arquivo
 	
-	linha = arquivo.read()			# leitura do arquivo
-	
-	mtu = MTU(linha)
-	mtu.inicializaFita3()
-	mtu.simulacao(verificaPadroes(linha))
-	
-		
-		
+	if(verificaPadroes(linha)):#verifica se o padrao da entrada
+		mtu = MTU(linha)
+		mtu.inicializaFita3()
+		mtu.simulacao()
 		
 if __name__ == "__main__":
 	main()
