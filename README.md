@@ -8,3 +8,5 @@ Implementação de uma máquina de turing universal de três fitas, onde cada fi
   - fita 3 inicializa vazia e é preenchida com o decorrer do processamento da máquina.
   
 A entrada da máquina é um arquivo txt com seu conteúdo utilizando o padrão  en(qi)0en(x)0en(qj)0en(y)0en(d).
+
+Copyright (c) 2019 Rodrigo Pinto Herculano, Túlio Freire
